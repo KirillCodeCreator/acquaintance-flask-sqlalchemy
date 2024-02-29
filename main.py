@@ -70,6 +70,20 @@ def edit_job(job_id):
     return render_template("add_job.html", title="Редактирование работы", form=form)
 
 
+@app.route("/delete-job/<int:job_id>", methods=["GET", "POST"])
+@login_required
+def delete_job(job_id):
+    db_sess = db_session.create_session()
+    job = db_sess.query(Jobs).filter(Jobs.id == job_id). \
+        filter((Jobs.team_leader == current_user) | (current_user.id == 1)).first()
+    if job:
+        db_sess.delete(job)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect("/")
+
+
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
