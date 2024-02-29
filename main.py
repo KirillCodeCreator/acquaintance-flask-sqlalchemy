@@ -149,7 +149,7 @@ def work_log():
 
 def main():
     db_session.global_init("db/blogs.db")
-    add_data_to_db()
+    # add_data_to_db()
     app.run("", port=8080)
 
 
