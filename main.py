@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, flash, request, abort
 from flask_login import login_user, LoginManager, login_required, current_user
 
 from data import db_session
+from data.data_seed import add_data_to_db
 from data.departments import Department
 from data.jobs import Jobs
 from data.users import User
@@ -203,7 +204,8 @@ def work_log():
 
 def main():
     db_session.global_init("db/blogs.db")
-    # add_data_to_db()
+    #для пересоздания таблиц раскоментировать ниже метод add_data_to_db(), предаврительно удалив файл БД db/blogs.db
+    #add_data_to_db()
     app.run("", port=8080)
 
 
