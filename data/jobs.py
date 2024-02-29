@@ -17,4 +17,4 @@ class Jobs(SqlAlchemyBase):  # SqlAlchemyBase Доступно в задании
     is_finished = sa.Column(sa.Boolean, default=False)
 
     def __repr__(self):
-        return f"<Jobs {self.id} {self.name} {self.email}>"
+        return f"<Jobs {self.id} {self.job} {self.is_finished}>"
