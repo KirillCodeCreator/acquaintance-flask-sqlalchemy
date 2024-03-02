@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy import orm
+from sqlalchemy_serializer import SerializerMixin
 
 from .db_session import SqlAlchemyBase
 
@@ -14,7 +15,7 @@ class Category(SqlAlchemyBase):
     name = sa.Column(sa.String)
 
 
-class Jobs(SqlAlchemyBase):  # SqlAlchemyBase Доступно в задании
+class Jobs(SqlAlchemyBase, SerializerMixin):  # SqlAlchemyBase Доступно в задании
     __tablename__ = 'jobs'
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     team_leader_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'))  # id лидера
