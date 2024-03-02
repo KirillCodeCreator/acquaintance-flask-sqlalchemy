@@ -98,12 +98,42 @@ def test_job_post():
     return test_result
 
 
+def test_missing_job_delete():
+    """Проверка, что метод DELETE удаления несуществующей работы завершится с ошибкой"""
+    job_id = 0
+    resp = requests.delete(f"{BASE_URL}/api/jobs/{job_id}")  # несуществующая работа
+    assert resp.status_code == 404 and "Not found" in resp.json()["error"]
+    return test_result
+
+
+def test_wrong_type_delete_job():
+    """Проверка, что метод DELETE удаления работы с неверным типом id завершится с ошибкой"""
+    resp = requests.delete(f"{BASE_URL}/api/jobs/string")
+    assert resp.status_code == 404
+    return test_result     
+
+
+def test_job_delete():
+    """Проверка, что метод для удаление работы завершится успешно"""
+    job_id = 1
+    resp = requests.delete(f"{BASE_URL}/api/jobs/{job_id}")
+    resp.raise_for_status()
+    resp = requests.get(f"{BASE_URL}/api/jobs/{job_id}")  # проверяем что такой работы уже нет
+    assert resp.status_code == 404 and "Not found" in resp.json()["error"]
+    return test_result
+
+
 print(f'Получение всех работ - {test_get_all_jobs()}')
 print(f'Получение одной работы - {test_get_job()}')
-print(f'Получение несуществующей работы - {test_wrong_get_job()}')
-print(f'Получение работы с неверным типом id - {test_wrong_type_get_job()}')
+print(f'Попытка получения несуществующей работы - {test_wrong_get_job()}')
+print(f'Попытка получения работы с неверным типом id - {test_wrong_type_get_job()}')
 
 print(f'Попытка создания работы с пустым запросом - {test_job_post_empty()}')
 print(f'Попытка создания работы с неполным запросом - {test_job_post_with_missing_fields()}')
 print(f'Попытка создания работы с несуществующим тим лидом  - {test_job_post_with_unknown_team_leader_id()}')
 print(f'Создание работы и проверка создания - {test_job_post()}')
+
+print(f'Попытка удаления несуществующей работы - {test_missing_job_delete()}')
+print(f'Попытка удаления работы с неверным типом id - {test_wrong_type_delete_job()}')
+print(f'Удаление работы и проверка отсутствия удаленной работы  - {test_job_delete()}')
+
