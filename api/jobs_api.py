@@ -1,8 +1,11 @@
+from datetime import datetime
+
 import flask
-from flask import jsonify, make_response
+from flask import jsonify, make_response, request
 
 from data import db_session
 from data.jobs import Jobs
+from data.users import User
 
 blueprint = flask.Blueprint(
     'jobs_api',
@@ -44,3 +47,37 @@ def get_one_jobs(job_id):
                 'is_finished'))]
         }
     )
+
+
+@blueprint.route("/api/jobs/", methods=["POST"])
+def create_job():
+    if not request.json:
+        return make_response(jsonify({'error': 'Empty request'}), 400)
+    allowed_fields = ["team_leader_id", "job", "work_size", "collaborators", "is_finished"]
+    if not all(key in request.json for key in allowed_fields):
+        return make_response(jsonify({'error': 'Missing fields'}), 400)
+    db_sess = db_session.create_session()
+    start_date = request.json.get("start_date")
+    if start_date:
+        start_date = datetime.fromisoformat(start_date)
+    end_date = request.json.get("end_date")
+    if end_date:
+        end_date = datetime.fromisoformat(end_date)
+    job = Jobs(
+        team_leader_id=request.json["team_leader_id"],
+        job=request.json["job"],
+        work_size=request.json["work_size"],
+        collaborators=request.json["collaborators"],
+        start_date=start_date,
+        end_date=end_date,
+        is_finished=request.json["is_finished"]
+    )
+    if not db_sess.query(User).filter(User.id == job.team_leader_id).first():
+        return make_response(jsonify({'error': 'team_leader_id unknown'}), 400)
+    db_sess.add(job)
+    db_sess.commit()
+    return jsonify(
+        {
+            'Success': 'OK',
+            'id': job.id
+        })
