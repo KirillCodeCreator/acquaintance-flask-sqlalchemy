@@ -15,7 +15,7 @@ def test_get_job():
     """получение одной работы"""
     resp = requests.get(f"{BASE_URL}/api/jobs/1")
     job = resp.json()["jobs"][0]
-    assert "is_finished" in job
+    assert job["id"] == 1
     return 'тест завершен'
 
 
