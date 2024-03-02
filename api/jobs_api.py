@@ -1,5 +1,5 @@
 import flask
-from flask import jsonify
+from flask import jsonify, make_response
 
 from data import db_session
 from data.jobs import Jobs
@@ -26,5 +26,21 @@ def get_jobs():
                         'is_finished'
                     ))
                     for job in jobs]
+        }
+    )
+
+
+@blueprint.route('/api/jobs/<int:job_id>', methods=['GET'])
+def get_one_jobs(job_id):
+    db_sess = db_session.create_session()
+    job = db_sess.query(Jobs).get(job_id)
+    if not job:
+        return make_response(jsonify({'error': 'Not found'}), 404)
+    return jsonify(
+        {
+            'jobs': job.to_dict(only=(
+                'id', 'team_leader_id', 'job', 'work_size',
+                'collaborators', 'start_date', 'end_date',
+                'is_finished'))
         }
     )
