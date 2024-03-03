@@ -59,6 +59,13 @@
             </div>
         {% endfor %}
 
+        {{ form.city_from.label }}
+        {{ form.city_from(class="form-control") }}
+        {% for error in form.city_from.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
 
         {{ form.position.label }}
         {{ form.position(class="form-control") }}

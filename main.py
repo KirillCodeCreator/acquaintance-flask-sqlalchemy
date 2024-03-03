@@ -1,4 +1,5 @@
-from flask import Flask, render_template, redirect, flash, request, abort
+import requests
+from flask import Flask, render_template, redirect, flash, request, abort, url_for, make_response, jsonify
 from flask_login import login_user, LoginManager, login_required, current_user
 
 from api import jobs_api, users_api
@@ -100,6 +101,7 @@ def register():
             position=form.position.data,
             speciality=form.speciality.data,
             address=form.address.data,
+            city_from=form.city_from.data,
             email=form.login.data,
         )
         user.set_password(form.password.data)
@@ -201,6 +203,44 @@ def work_log():
     db_sess = db_session.create_session()
     jobs = db_sess.query(Jobs).all()
     return render_template("work_log.html", jobs=jobs)
+
+
+@app.route("/users_show/<int:user_id>")
+def users_show(user_id):
+    resp = requests.get(f'{request.host_url}{url_for("users_api.get_user", user_id=user_id)}')
+    if not resp:
+        err = resp.json()["error"]
+        return make_response(jsonify(f'Error: {err}'), 404)
+    user = resp.json()["users"][0]
+    user_city = user["city_from"]
+    if len(user_city) > 0:
+        geocoder_params = {
+            "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+            "geocode": user_city,
+            "format": "json"
+        }
+        geocode_resp = requests.get("http://geocode-maps.yandex.ru/1.x/", params=geocoder_params)
+        if not geocode_resp:
+            user['city_from'] = f"Geocoder for '{user_city}': {geocode_resp.status_code}. {geocode_resp.reason}"
+            return render_template("user.html", user_data=user)
+        geocode_json = geocode_resp.json()
+        try:
+            point = geocode_json["response"]["GeoObjectCollection"]["featureMember"][0][
+                "GeoObject"]["Point"]["pos"]
+        except (KeyError, IndexError):
+            return render_template("user.html", user_data=user)
+        point = ",".join(point.split())
+        map_static_params = {
+            "ll": point,
+            "l": "sat",
+            "z": 13,
+        }
+        map_url = requests.Request(url="https://static-maps.yandex.ru/1.x/",
+                                   params=map_static_params).prepare().url
+        return render_template("user_city.html", user_data=user, map_url=map_url)
+    else:
+        user['city_from'] = 'empty'
+        return render_template("user.html", user_data=user)
 
 
 def main():
