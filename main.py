@@ -1,8 +1,9 @@
 from flask import Flask, render_template, redirect, flash, request, abort
 from flask_login import login_user, LoginManager, login_required, current_user
 
-from api import jobs_api
+from api import jobs_api, users_api
 from data import db_session
+from data.data_seed import add_data_to_db
 from data.departments import Department
 from data.jobs import Jobs
 from data.users import User
@@ -205,8 +206,10 @@ def work_log():
 def main():
     db_session.global_init("db/blogs.db")
     # для пересоздания таблиц раскоментировать ниже метод add_data_to_db(), предаврительно удалив файл БД db/blogs.db
-    # add_data_to_db()
+    #add_data_to_db()
     app.register_blueprint(jobs_api.blueprint)
+    app.register_blueprint(users_api.blueprint)
+
     app.run("", port=8080)
 
 
