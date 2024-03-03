@@ -1,4 +1,5 @@
 from datetime import datetime
+from random import randint
 
 import requests
 
@@ -110,16 +111,57 @@ def test_wrong_type_delete_job():
     """Проверка, что метод DELETE удаления работы с неверным типом id завершится с ошибкой"""
     resp = requests.delete(f"{BASE_URL}/api/jobs/string")
     assert resp.status_code == 404
-    return test_result     
+    return test_result
 
 
 def test_job_delete():
     """Проверка, что метод для удаление работы завершится успешно"""
-    job_id = 1
+    """получение всех работ"""
+    resp = requests.get(f"{BASE_URL}/api/jobs")
+    jobs = resp.json()["jobs"]
+    job = jobs[-1]
+    job_id = job['id']
     resp = requests.delete(f"{BASE_URL}/api/jobs/{job_id}")
     resp.raise_for_status()
     resp = requests.get(f"{BASE_URL}/api/jobs/{job_id}")  # проверяем что такой работы уже нет
     assert resp.status_code == 404 and "Not found" in resp.json()["error"]
+    return test_result
+
+
+def test_wrong_type_edit_job():
+    """редактирование работы с неверным типом id"""
+    resp = requests.put(f"{BASE_URL}/api/jobs/string")
+    assert resp.status_code == 404
+    return test_result
+
+
+def test_missing_job_edit():
+    """редактирование работы неизвестным id"""
+    resp = requests.put(f"{BASE_URL}/api/jobs/9999")
+    assert resp.status_code == 404 and "Not found" in resp.json()["error"]
+    return test_result
+
+
+def test_job_edit():
+    """Успешное редактирование работы и проверка результата"""
+    job_id = 2
+    work_size = randint(1, 100)
+    data = {
+        "id": 2,
+        "team_leader_id": 4,
+        "job": "Working hard",
+        "work_size": work_size,
+        "collaborators": "1, 2, 3",
+        "start_date": datetime.now().isoformat(),
+        "end_date": None,
+        "is_finished": False
+    }
+    resp = requests.put(f"{BASE_URL}/api/jobs/{job_id}", json=data)
+    resp.raise_for_status()
+    resp = requests.get(f"{BASE_URL}/api/jobs/{job_id}")
+    resp.raise_for_status()
+    job = resp.json()["jobs"][0]
+    assert job["work_size"] == work_size
     return test_result
 
 
@@ -137,3 +179,6 @@ print(f'Попытка удаления несуществующей работ�
 print(f'Попытка удаления работы с неверным типом id - {test_wrong_type_delete_job()}')
 print(f'Удаление работы и проверка отсутствия удаленной работы  - {test_job_delete()}')
 
+print(f'Попытка редактирования несуществующей работы - {test_missing_job_edit()}')
+print(f'Попытка редактирования работы с неверным типом id - {test_wrong_type_edit_job()}')
+print(f'Редактирование работы и проверка работы  - {test_job_edit()}')
