@@ -5,7 +5,7 @@ from flask_restful import reqparse
 
 def check_password_hash(password_hash):
     hash_method = password_hash.split("$")[0]
-    if ":".join(hash_method.split(':')[:2]) != "pbkdf2:sha256":
+    if ":".join(hash_method.split(':')[:2]) != "scrypt:32768":
         raise ValueError("Wrong type hash. Must be werkzeug type.")
     return password_hash
 

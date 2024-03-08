@@ -72,7 +72,11 @@ class UsersListResource(Resource):
         )
         db_sess.add(user)
         db_sess.commit()
-        return jsonify({'success': 'OK'})
+        return jsonify(
+            {
+                'Success': 'OK',
+                'id': user.id
+            })
 
 
 def init_api_v2_routes(api: Api):
