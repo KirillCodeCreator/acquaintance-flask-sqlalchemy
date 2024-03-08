@@ -1,8 +1,10 @@
 import requests
 from flask import Flask, render_template, redirect, flash, request, abort, url_for, make_response, jsonify
 from flask_login import login_user, LoginManager, login_required, current_user, logout_user
+from flask_restful import Api
 
 from api import jobs_api, users_api
+from api.users_resource import init_api_v2_routes
 from data import db_session
 from data.departments import Department
 from data.jobs import Jobs
@@ -14,6 +16,7 @@ from forms.users import RegisterForm, LoginForm
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager(app)
+api = Api(app)
 
 
 @login_manager.user_loader
@@ -251,11 +254,9 @@ def users_show(user_id):
 
 def main():
     db_session.global_init("db/blogs.db")
-    # для пересоздания таблиц раскоментировать ниже метод add_data_to_db(), предаврительно удалив файл БД db/blogs.db
-    # add_data_to_db()
     app.register_blueprint(jobs_api.blueprint)
     app.register_blueprint(users_api.blueprint)
-
+    init_api_v2_routes(api)
     app.run("", port=8080)
 
 
