@@ -4,6 +4,7 @@ from flask_login import login_user, LoginManager, login_required, current_user, 
 from flask_restful import Api
 
 from api import jobs_api, users_api
+from api.jobs_resource import init_api_v2_routes_jobs
 from api.users_resource import init_api_v2_routes
 from data import db_session
 from data.departments import Department
@@ -257,6 +258,7 @@ def main():
     app.register_blueprint(jobs_api.blueprint)
     app.register_blueprint(users_api.blueprint)
     init_api_v2_routes(api)
+    init_api_v2_routes_jobs(api)
     app.run("", port=8080)
 
 
