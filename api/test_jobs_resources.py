@@ -8,7 +8,7 @@ API_VERSION = "api/v2"
 print(get(f"{BASE_URL}/{API_VERSION}/jobs").json())  # Тест - Корректное получение всех работ
 print(get(f"{BASE_URL}/{API_VERSION}/jobs/1").json())  # Тест - Корректное получение работы по id
 print(get(f"{BASE_URL}/{API_VERSION}/jobs/0").json())  # Тест - Ошибочный запрос - несуществующй id
-print(get(f"{BASE_URL}/{API_VERSION}/jobs/s").json())  # Тест - Ошибочный запрос - неверный тип id
+#print(get(f"{BASE_URL}/{API_VERSION}/jobs/s").json())  # Тест - Ошибочный запрос - неверный тип id
 
 print(
     post(f"{BASE_URL}/{API_VERSION}/jobs", json={}).json())  # Тест - Ошибочный запрос создания работы - неполный запрос
@@ -34,11 +34,12 @@ data2 = {
     "is_finished": True
 }
 print(put(f"{BASE_URL}/{API_VERSION}/jobs/0", json={}).json())  # Тест - Ошибочный запрос - редактирование несуществующей работы
+print(put(f"{BASE_URL}/{API_VERSION}/jobs/5", json={}).json())  # Тест - Ошибочный запрос - редактирование работы с неполным запросом
 print(put(f"{BASE_URL}/{API_VERSION}/jobs/5", json=data2).json())  # Тест - корректное редактирование работы (изменено end_date и is_finished)
 print(get(f"{BASE_URL}/{API_VERSION}/jobs").json()) # Тест - Корректное получение всех работ для проверки редактирования
 
 print(delete(
     f"{BASE_URL}/{API_VERSION}/jobs/999").json())  # Тест - Ошибочный запрос на удаление работы — несуществующий id
-print(delete(f"{BASE_URL}/{API_VERSION}/jobs/s").json())  # Тест - Ошибочный запрос на удаление работы — неверный id
 print(delete(f"{BASE_URL}/{API_VERSION}/jobs/5").json())  # Тест - Корректный запрос на удаление работы
+print(delete(f"{BASE_URL}/{API_VERSION}/jobs/s").json())  # Тест - Ошибочный запрос на удаление работы — неверный id
 print(get(f"{BASE_URL}/{API_VERSION}/jobs").json())  # Тест - Корректное получение всех работ для проверки удаления

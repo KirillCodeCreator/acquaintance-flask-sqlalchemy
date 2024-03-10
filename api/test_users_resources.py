@@ -39,6 +39,7 @@ data2 = {
     "modified_date": datetime.datetime.now().isoformat(),
 }
 print(put(f"{BASE_URL}/{API_VERSION}/users/0", json={}).json())  # Тест - Ошибочный запрос - редактирование несуществующего пользователя
+print(put(f"{BASE_URL}/{API_VERSION}/users/6", json={}).json())  # Тест - Ошибочный запрос - редактирование c неполным запросом
 print(put(f"{BASE_URL}/{API_VERSION}/users/6", json=data2).json())  # Тест - корректное редактирование пользователя (изменено position и modified_date)
 print(get(f"{BASE_URL}/{API_VERSION}/users").json())  # Тест - Корректное получение всех пользователей для проверки редактирования
 
